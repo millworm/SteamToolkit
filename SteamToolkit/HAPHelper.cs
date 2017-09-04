@@ -57,8 +57,22 @@ namespace BotDataScrapeTools
 
         public static HtmlDocument LoadDocumentFromUrl(Web web, string url, CookieContainer authContainer = null)
         {
-            string result = web.Fetch(url, "GET",null,authContainer)?.ReadStream();
-            if (result == null) return null;
+            int retryCount = 0;
+            string result = null;
+            while (result == null)
+            {
+                try
+                {
+                    result = web.Fetch(url, "GET", null, authContainer)?.ReadStream();
+                }
+                catch (Exception)
+                {
+                    if (retryCount > 3) return null;
+                    retryCount++;
+                    //consume exception
+                }
+            }
+
             using (
                 var reader = new StringReader(result)
                 )

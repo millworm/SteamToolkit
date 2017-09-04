@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using Newtonsoft.Json;
+using System.IO;
+using SteamAuth;
 
 namespace SteamToolkit.Web
 {
@@ -47,7 +49,7 @@ namespace SteamToolkit.Web
         /// <returns>IResponse interace.</returns>
         public IResponse Fetch(string url, string method,
             Dictionary<string, string> data = null,
-            CookieContainer cookies = null, bool xHeaders = true, string referer = "", bool isWebkit = false, int retryWait = 5000, int retryLimit = 5)
+            CookieContainer cookies = null, bool xHeaders = true, string referer = "", bool isWebkit = false, int retryWait = 2000, int retryLimit = 5)
         {
             IResponse response = RetryRequestProcessor(retryWait, retryLimit, url, method, data, cookies, xHeaders,
                 referer, isWebkit);
@@ -71,7 +73,6 @@ namespace SteamToolkit.Web
                 }
                 catch (WebException we)
                 {
-                    HttpWebResponse response = we.Response as HttpWebResponse;;
                     switch (we.Status)
                     {
                         case WebExceptionStatus.SendFailure:
@@ -148,7 +149,7 @@ namespace SteamToolkit.Web
                     {"password", encryptedBase64Password},
                     {"username", username},
                     {"loginfriendlyname", string.Empty},
-                    {"remember_login", "false"}
+                    {"remember_login", "true"}
                 };
                 // Captcha
                 string capText = string.Empty;
@@ -179,7 +180,14 @@ namespace SteamToolkit.Web
                 //TwoFactor
                 if (twoFactor && !loginJson.Success)
                 {
-                    twoFactorText = userInputOutput.GetInput("TwoFactor code required: ", "Two Factor Authentication");
+                    if (File.Exists("account.maFile"))
+                    {
+                        var sgAccount = JsonConvert.DeserializeObject<SteamGuardAccount>(File.ReadAllText("account.maFile"));
+                        twoFactorText=sgAccount.GenerateSteamGuardCode();
+                    }
+                    else
+                        twoFactorText = userInputOutput.GetInput("TwoFactor code required: ", "Two Factor Authentication");
+
                 }
 
                 data.Add("twofactorcode", twoFactor ? twoFactorText : string.Empty);
@@ -210,7 +218,10 @@ namespace SteamToolkit.Web
             else if (loginJson.TransferParameters?.Steamid != null)
                 account = new Account(Convert.ToUInt64(loginJson.TransferParameters.Steamid));
             else
+            {
+                Console.WriteLine(loginJson.Message);
                 return null;
+            }
 
             if (loginJson.Success)
             {
