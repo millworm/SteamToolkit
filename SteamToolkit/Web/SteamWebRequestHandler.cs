@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿
+
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Cache;
 using System.Text;
@@ -39,8 +41,8 @@ namespace SteamToolkit.Web
 
             request.UserAgent =
                 "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36";
-            request.Referer = string.IsNullOrEmpty(referer) ? "http://steamcommunity.com/" : referer;
-            request.Timeout = 50000;
+            request.Referer = string.IsNullOrEmpty(referer) ? "https://steamcommunity.com/" : referer;
+            request.Timeout = 5000;
             request.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.Revalidate);
             request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 

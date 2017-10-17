@@ -6,6 +6,6 @@ namespace SteamToolkit.Trading
     public class Trade
     {
         [JsonProperty("tradeid")]
-        public ulong TradeId { get; set; }
+        public ulong? TradeId { get; set; }
     }
 }
