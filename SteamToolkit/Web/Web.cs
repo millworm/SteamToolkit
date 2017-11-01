@@ -73,6 +73,7 @@ namespace SteamToolkit.Web
                 }
                 catch (WebException we)
                 {
+                    HttpWebResponse response = we.Response as HttpWebResponse;
                     switch (we.Status)
                     {
                         case WebExceptionStatus.SendFailure:
