@@ -120,8 +120,6 @@ namespace SteamToolkit.Trading
             var stream = WebUtility.UrlDecode(_web.Fetch(string.Format(url, tradeId), "POST",
                 data, container, false, "https://steamcommunity.com/tradeoffer/" + tradeId + "/").ReadStream());
 
-            using (var sw = new System.IO.StreamWriter("EconServiceHandler.txt", true))
-                sw.WriteLine($"{new string('-', 50)}\n{stream}\n{new string('-', 50)}");
             return
                 JsonConvert.DeserializeObject<Trade>(stream);
         }

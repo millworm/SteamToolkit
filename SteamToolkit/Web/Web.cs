@@ -288,14 +288,16 @@ namespace SteamToolkit.Web
                 try
                 {
                     account = DoLogin(username, password, machineAuth, userInputOutput);
+
+                    retries++;
+                    Thread.Sleep(retryWait);
                 }
                 catch (WebException)
                 {
-                    retries++;
                     if (retries == retryLimit) throw;
-                    Thread.Sleep(retryWait);
                 }
-            } while (account == null);
+                
+            } while (account == null && retries < retryLimit);
             return account;
         }
 
